@@ -38,37 +38,152 @@ public class LexicalAnalysis implements AutoCloseable {
             
             switch (state) {
                 case 1:
-                    // TODO: Implement me!
+                	if (c == ' ' || c == '\t' || c == '\r') {
+                		state = 1;
+                	} else if (c == '\n') {
+                		this.line++;
+                		state = 1;
+                	} else if (c == '#') {
+                		state = 2;
+                	} else if (c == '.') {
+                		lex.token += (char) c;
+                		state = 3;
+                	} else if (c == '=') {
+                		lex.token += (char) c;
+                		state = 5;
+                	} else if (c == '<' || c == '>') {
+                		lex.token += (char) c;
+                		state = 6;
+                	} else if (c == '*') {
+                		lex.token += (char) c;
+                		state = 7;
+                	} else if (c == '!') {
+                		lex.token += (char) c;
+                		state = 8;
+                	} else if (c == ';' || c == ',' || c == '+'||
+                			c == '-' || c == '%' || c == '/' ||
+                			c == '[' || c == ']' || c == '(' ||
+                			c == ')') {
+                		lex.token += (char) c;
+                		state = 12;
+                	} else if (Character.isLetter(c)) {
+                		lex.token += (char) c;
+                		state = 9;
+                	} else if (Character.isDigit(c)) {
+                		lex.token += (char) c;
+                		state = 10;
+                	} else if (c == '\'') {
+                		lex.token += (char) c;
+                		state = 11;
+                	} else if (c == -1) {
+                		lex.type = TokenType.END_OF_FILE;
+                		state = 13;
+                	} else {
+                		lex.token += (char) c;
+                		lex.type = TokenType.INVALID_TOKEN;
+                		state = 13;
+                	}
                     break;
                 case 2:
-                    // TODO: Implement me!
+                    if (c == '\n') {
+                    	this.line++;
+                    	state = 1;
+                    } else if (c == -1) {
+                		lex.type = TokenType.END_OF_FILE;
+                		state = 13;
+                	} else {
+                		state = 2;
+                	}
                     break;
                 case 3:
-                    // TODO: Implement me!
+                   if (c == '.') {
+                	   lex.token += (char) c;
+                	   state = 4;
+                   } else {
+                	   ungetc(c);
+                	   lex.type = TokenType.NOT_EQUALS;
+                	   state = 12;
+                   }
                     break;
                 case 4:
-                    // TODO: Implement me!
+                    if (c == '.') {
+                    	lex.token += (char) c;
+                    	state = 12;
+                    } else {
+                    	ungetc(c);
+                    	lex.type = TokenType.NOT_EQUALS;
+                 	    state = 12;
+                    }
                     break;
                 case 5:
-                    // TODO: Implement me!
+                   if (c == '=' ) {
+                	   lex.token += (char) c;
+                	   state = 6;
+                   } else {
+                	   ungetc(c);
+                	   lex.type = TokenType.NOT_EQUALS;
+                	   state = 12;
+                   }
                     break;
                 case 6:
-                    // TODO: Implement me!
+                    if (c == '=') {
+                    	lex.token += (char) c;
+                 	    state = 12;
+                    } else {
+                 	    ungetc(c);
+                 	    lex.type = TokenType.NOT_EQUALS;
+                 	    state = 12;
+                    }
                     break;
                 case 7:
-                    // TODO: Implement me!
+                    if (c == '*') {
+                    	lex.token += (char) c;
+                    	state = 12;
+                    } else {
+                 	    ungetc(c);
+                 	    lex.type = TokenType.INVALID_TOKEN;
+                 	    state = 12;
+                    }
                     break;
                 case 8:
-                    // TODO: Implement me!
+                    if (c == '=') {
+                    	lex.token += (char) c;
+                    	state = 12;
+                    } else {
+                    	ungetc(c);
+                    	lex.type = TokenType.INVALID_TOKEN;
+                    	state = 13;
+                    }
                     break;
                 case 9:
-                    // TODO: Implement me!
+                    if (Character.isLetter(c)) {
+                    	lex.token += (char) c;
+                    	state = 9;
+                    } else {
+                    	ungetc(c);
+                    	lex.type = TokenType.INTEGER;
+                    	state = 12;
+                    }
                     break;
                 case 10:
-                    // TODO: Implement me!
+                    if (Character.isDigit(c)) {
+                    	lex.token += (char) c;
+                    	state = 10;
+                    } else {
+                    	ungetc(c);
+                    	lex.type = TokenType.INTEGER;
+                    	state = 13;
+                    }
                     break;
                 case 11:
-                    // TODO: Implement me!
+                	if (c == '\'') {
+                    	lex.token += (char) c;
+                    	state = 13;
+                    } else {
+                    	ungetc(c);
+                    	lex.type = TokenType.INVALID_TOKEN;
+                    	state = 13;
+                    }
                     break;
                 default:
                     throw new LexicalException("Unreachable");
