@@ -20,7 +20,6 @@ public class ConvExpr extends Expr {
         Value<?> v = expr.expr();
         if (!(v instanceof IntegerValue))
             Utils.abort(super.getLine());
-
         if (op == ConvOp.MinusOp) {
             IntegerValue iv = (IntegerValue) v;
             int n = iv.value();

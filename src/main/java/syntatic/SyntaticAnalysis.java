@@ -9,6 +9,9 @@ import interpreter.command.Command;
 import interpreter.command.IfCommand;
 import interpreter.command.OutputCommand;
 import interpreter.command.OutputOp;
+import interpreter.command.UnlessCommand;
+import interpreter.command.UntilCommand;
+import interpreter.command.WhileCommand;
 import interpreter.expr.BoolExpr;
 import interpreter.expr.BoolOp;
 import interpreter.expr.CompositeBoolExpr;
@@ -138,9 +141,9 @@ public class SyntaticAnalysis {
     // Feito
     // <if>       ::= if <boolexpr> [ then ] <code> { elsif <boolexpr> [ then ] <code> } [ else <code> ] end
     private Command procIf() throws LexicalException {
-        Command mainCmd = null;
-        
+        int line = lex.getLine();
         eat(TokenType.IF);
+        
         BoolExpr expr = procBoolExpr();
         
         boolean hasThen = false;
@@ -157,11 +160,14 @@ public class SyntaticAnalysis {
             cmd = procCmd();
         
         // A sequência de condições e comandos dos else if seguintes serão armazenadas em dois distintos ArrayLists
+        ArrayList<Integer> followingLines = new ArrayList();
         ArrayList<BoolExpr> followingElsesExprs = new ArrayList();
         ArrayList<Command> followingElsesCmds = new ArrayList();
-        
+
         while(current.type == TokenType.ELSIF){
             advance();
+            
+            followingLines.add(lex.getLine());
             followingElsesExprs.add(procBoolExpr());
             
             Boolean elseifHasThen = false;
@@ -179,72 +185,113 @@ public class SyntaticAnalysis {
             followingElsesCmds.add(elseifCmd);
         }
         
-        Command elseCmd = null;
+        Command elseCmd = null; // o comando do else é nulo se não houver "else"
         if (current.type == TokenType.ELSE){
             advance();
             elseCmd = procCode();
         }
         
+        eat(TokenType.END);
+                
         int lastIndex = followingElsesCmds.size() - 1;
-        int line = lex.getLine(); // Precisa ser dinamizado o local das linhas
         
         for(int i=lastIndex;i>=0;i--){
+            int itLine = followingLines.get(i);
             Command itCmd = followingElsesCmds.get(i);
             BoolExpr itExpr = followingElsesExprs.get(i);
             
+            followingLines.remove(i);
             followingElsesCmds.remove(i);
             followingElsesExprs.remove(i);
             
-            elseCmd = new IfCommand(line,itExpr,itCmd,elseCmd);
+            elseCmd = new IfCommand(itLine,itExpr,itCmd,elseCmd);
         }
         
-        mainCmd = new IfCommand(line,expr,cmd,elseCmd);
-        eat(TokenType.END);
-        return mainCmd;
+        Command ifCmd = new IfCommand(line,expr,cmd,elseCmd);
+        return ifCmd;
     }
 
+    // Feito
     // <unless>   ::= unless <boolexpr> [ then ] <code> [ else <code> ] end
-    private void procUnless() throws LexicalException {
+    private Command procUnless() throws LexicalException {
+        int line = lex.getLine();
         eat(TokenType.UNLESS);
         
-        procBoolExpr();
+        BoolExpr expr = procBoolExpr();
+        
+        boolean hasThen = false;
         if (current.type == TokenType.THEN){
+            hasThen = true;
             advance();
         }
-        procCode();
         
+        Command cmd;
+        if(hasThen)
+            cmd = procCode();
+        else
+            cmd = procCmd();
+        
+        
+        Command elseCmd = null;
         if(current.type == TokenType.ELSE){
             advance();
-            procCode();
+            elseCmd = procCode();
         }
         
         eat(TokenType.END);
+        
+        Command unlessCommand = new UnlessCommand(line,expr,cmd,elseCmd);
+        return unlessCommand;
     }
 
     // <while>    ::= while <boolexpr> [ do ] <code> end
-    private void procWhile() throws LexicalException {
+    private Command procWhile() throws LexicalException {
+        int line = lex.getLine();
         eat(TokenType.WHILE);
 
-        procBoolExpr();
+        BoolExpr expr = procBoolExpr();
 
+        boolean hasDo = false;
         if (current.type == TokenType.DO){
+            hasDo = true;
             advance();
         }
-        
-        procCode();
+
+        Command cmd;
+        if(hasDo)
+            cmd = procCode();
+        else
+            cmd = procCmd();
+
         eat(TokenType.END);
+        
+        Command whileCmd = new WhileCommand(line,expr,cmd);
+        return whileCmd;
     }
 
     // <until>    ::= until <boolexpr> [ do ] <code> end
-    private void procUntil() throws LexicalException {
+    private Command procUntil() throws LexicalException {
+        int line = lex.getLine();
         eat(TokenType.UNTIL);
         
-        procBoolExpr();
+        BoolExpr expr = procBoolExpr();
+        
+        boolean hasDo = false;
         if(current.type == TokenType.DO){
+            hasDo = true;
             advance();
         }
-        procCode();
+        
+        Command cmd;
+        if(hasDo)
+            cmd = procCode();
+        else
+            cmd = procCmd();
+        
         eat(TokenType.END);
+        
+        Command untilCmd = new UntilCommand(line,expr,cmd);
+        return untilCmd;
     }
 
     // <for>      ::= for <id> in <expr> [ do ] <code> end

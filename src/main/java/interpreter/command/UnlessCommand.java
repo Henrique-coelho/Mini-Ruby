@@ -3,12 +3,12 @@ package interpreter.command;
 
 import interpreter.expr.BoolExpr;
 
-public class IfCommand extends Command{
+public class UnlessCommand extends Command{
     private BoolExpr cond;
     private Command thenCmds;
     private Command elseCmds;
 
-    public IfCommand (int line, BoolExpr cond, Command thenCmds, Command elseCmds){
+    public UnlessCommand (int line, BoolExpr cond, Command thenCmds, Command elseCmds){
         super(line);
         this.cond = cond;
         this.thenCmds = thenCmds;
@@ -17,15 +17,11 @@ public class IfCommand extends Command{
     
     @Override
     public void execute() {
-        if(cond.expr()){
+        if(!cond.expr()){
             thenCmds.execute();
         }
         else if(elseCmds != null){
             elseCmds.execute();
         }
-    }
-    
-    public void setElseCommand(Command elseCmds){
-        this.elseCmds = elseCmds;
     }
 }

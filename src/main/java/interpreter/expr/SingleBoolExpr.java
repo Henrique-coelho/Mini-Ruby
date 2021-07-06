@@ -2,9 +2,11 @@
 package interpreter.expr;
 
 import interpreter.util.Utils;
+import interpreter.value.ArrayValue;
 import interpreter.value.IntegerValue;
 import interpreter.value.StringValue;
 import interpreter.value.Value;
+import java.util.Vector;
 
 public class SingleBoolExpr extends BoolExpr{
     private final Expr left;
@@ -63,8 +65,37 @@ public class SingleBoolExpr extends BoolExpr{
                     return (l_int <= r_int);
             }
         }
-        else {
-            // Ainda deve ser feito a parte do Contains
+        else if(op == RelOp.ContainsOp) {
+            if(l instanceof ArrayValue && !(r instanceof ArrayValue)){
+                ArrayValue l_expanded = (ArrayValue) l;
+                Vector<Value<?>> array = l_expanded.value();
+                
+                // O item procurado é um inteiro, logo usará operações de inteiros
+                if(r instanceof IntegerValue){    
+                    IntegerValue r_expanded = (IntegerValue) r;
+                    int value = r_expanded.value();
+                    
+                    for(Value<?> valueInArray : array)
+                        if(valueInArray instanceof IntegerValue){
+                            IntegerValue valueInArray_expanded = (IntegerValue) valueInArray;
+                            if(value == valueInArray_expanded.value())
+                                return true;
+                        }
+                }
+                // Senão, o item é uma String, e logo será tratada com operações de String
+                else {
+                    StringValue r_expanded = (StringValue) r;
+                    String value = r_expanded.value();
+                    
+                    for(Value<?> valueInArray : array)
+                        if(valueInArray instanceof StringValue){
+                            StringValue valueInArray_expanded = (StringValue) valueInArray;
+                            if(value.equals(valueInArray_expanded.value()))
+                                return true;
+                        }
+                }
+                return false;
+            }
         }
         return false; // FailSafe
     }
