@@ -35,7 +35,7 @@ public class LexicalAnalysis implements AutoCloseable {
         int state = 1;
         while (state != 12 && state != 13) {
             int c = getc();
-            
+            //System.out.println("Current State: " + state);
             switch (state) {
                 case 1:
                 	if (c == ' ' || c == '\t' || c == '\r') {
@@ -66,14 +66,13 @@ public class LexicalAnalysis implements AutoCloseable {
                 			c == ')') {
                 		lex.token += (char) c;
                 		state = 12;
-                	} else if (Character.isLetter(c)) {
+                	} else if (Character.isLetter(c)||c == '_') {
                 		lex.token += (char) c;
                 		state = 9;
                 	} else if (Character.isDigit(c)) {
                 		lex.token += (char) c;
                 		state = 10;
                 	} else if (c == '\'') {
-                		lex.token += (char) c;
                 		state = 11;
                 	} else if (c == -1) {
                 		lex.type = TokenType.END_OF_FILE;
@@ -156,7 +155,7 @@ public class LexicalAnalysis implements AutoCloseable {
                     }
                     break;
                 case 9:
-                    if (Character.isLetter(c)) {
+                    if (Character.isLetter(c)||c == '_') {
                     	lex.token += (char) c;
                     	state = 9;
                     } else {
@@ -176,12 +175,11 @@ public class LexicalAnalysis implements AutoCloseable {
                     }
                     break;
                 case 11:
-                	if (c == '\'') {
+                    if (c != '\'') {
                     	lex.token += (char) c;
-                    	state = 13;
+                        state = 11;
                     } else {
-                    	ungetc(c);
-                    	lex.type = TokenType.INVALID_TOKEN;
+                    	lex.type = TokenType.STRING;
                     	state = 13;
                     }
                     break;
@@ -193,6 +191,7 @@ public class LexicalAnalysis implements AutoCloseable {
         if (state == 12)
             lex.type = st.find(lex.token);
 
+        //System.out.println("Token:" + lex.token);
         return lex;
     }
 

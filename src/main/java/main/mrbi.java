@@ -10,6 +10,7 @@ import syntatic.SyntaticAnalysis;
 public class mrbi {
 
     public static void main(String[] args) throws LexicalException {
+        System.out.println(args[0]);
         if (args.length != 1) {
             System.out.println("Usage: java mrbi [miniRuby file]");
             return;
@@ -19,12 +20,15 @@ public class mrbi {
             // O código a seguir é dado para testar o interpretador.
             // TODO: descomentar depois que o analisador léxico estiver OK.
             SyntaticAnalysis s = new SyntaticAnalysis(l);
+            ///*
             Command c = s.start();
+            System.out.println("The resuting code is:\n");
             c.execute();
-
+            //*/
             // O código a seguir é usado apenas para testar o analisador léxico.
             // TODO: depois de pronto, comentar o código abaixo.
-            /*Lexeme lex = l.nextToken();
+            /*
+            Lexeme lex = l.nextToken();
             while (checkType(lex.type)) {
                 System.out.printf("(\"%s\", %s)\n", lex.token, lex.type);
                 lex = l.nextToken();

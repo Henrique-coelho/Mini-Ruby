@@ -20,7 +20,7 @@ public class InputExpr extends Expr {
     public Value<?> expr(){
         if (op == InputOp.GetsOp){
             Scanner scanner = new Scanner(System.in);
-            String input = scanner.nextLine(); // Atenção: eu não sei se nextLine pega o \n ou não. Precisa ser conferido
+            String input = scanner.nextLine();
             
             StringValue inputValue = new StringValue(input);
             return inputValue;

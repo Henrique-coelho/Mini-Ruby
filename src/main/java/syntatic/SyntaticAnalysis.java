@@ -105,6 +105,7 @@ public class SyntaticAnalysis {
 
     // <code>     ::= { <cmd> }
     private BlocksCommand procCode() throws LexicalException {
+        System.out.println("Doing procCode");
         int line = lex.getLine();
         List<Command> cmds = new ArrayList<>();
 
@@ -127,6 +128,7 @@ public class SyntaticAnalysis {
 
     // <cmd>      ::= <if> | <unless> | <while> | <until> | <for> | <output> | <assign>
     private Command procCmd() throws LexicalException {
+        System.out.println("Doing procCmd");
         Command cmd = null;
         if(current.type == TokenType.IF){
             cmd = procIf();
@@ -145,7 +147,8 @@ public class SyntaticAnalysis {
         }
         else if (current.type == TokenType.PUTS || current.type == TokenType.PRINT) {
             cmd = procOutput();
-        } else {
+        } 
+        else {
             cmd = procAssign();
         }
         return cmd;
@@ -154,6 +157,7 @@ public class SyntaticAnalysis {
     // Feito
     // <if>       ::= if <boolexpr> [ then ] <code> { elsif <boolexpr> [ then ] <code> } [ else <code> ] end
     private Command procIf() throws LexicalException {
+        System.out.println("Doing procIf");
         int line = lex.getLine();
         eat(TokenType.IF);
         
@@ -210,6 +214,7 @@ public class SyntaticAnalysis {
     // Feito
     // <unless>   ::= unless <boolexpr> [ then ] <code> [ else <code> ] end
     private Command procUnless() throws LexicalException {
+        System.out.println("Doing procUnless");
         int line = lex.getLine();
         eat(TokenType.UNLESS);
         
@@ -231,8 +236,10 @@ public class SyntaticAnalysis {
         return unlessCommand;
     }
 
+    // Feito
     // <while>    ::= while <boolexpr> [ do ] <code> end
     private Command procWhile() throws LexicalException {
+        System.out.println("Doing procWhile");
         int line = lex.getLine();
         eat(TokenType.WHILE);
 
@@ -250,8 +257,10 @@ public class SyntaticAnalysis {
         return whileCmd;
     }
 
+    // Feito
     // <until>    ::= until <boolexpr> [ do ] <code> end
     private Command procUntil() throws LexicalException {
+        System.out.println("Doing procUntil");
         int line = lex.getLine();
         eat(TokenType.UNTIL);
         
@@ -272,6 +281,7 @@ public class SyntaticAnalysis {
     // Feito
     // <for>      ::= for <id> in <expr> [ do ] <code> end
     private ForCommand procFor() throws LexicalException {
+        System.out.println("Doing procFor");
         int line = lex.getLine();
         eat(TokenType.FOR);
         
@@ -295,16 +305,20 @@ public class SyntaticAnalysis {
 
     // <output>   ::= ( puts | print ) [ <expr> ] [ <post> ] ';'
     private Command procOutput() throws LexicalException {
+        System.out.println("Doing procOutput");
         OutputOp op = null;
         if (current.type == TokenType.PUTS) {
             op = OutputOp.PutsOp;
             advance();
-        } else if (current.type == TokenType.PRINT) {
+        } 
+        else if (current.type == TokenType.PRINT) {
             op = OutputOp.PrintOp;
             advance();
-        } else {
+        } 
+        else {
             showError();
         }
+        
         int line = lex.getLine();
 
         Expr expr = null;
@@ -333,6 +347,7 @@ public class SyntaticAnalysis {
     //Feito
     // <assign>   ::= <access> { ',' <access> } '=' <expr> { ',' <expr> } [ <post> ] ';'
     private Command procAssign() throws LexicalException {
+        System.out.println("Doing procAssign");
         int line = lex.getLine();
         Vector<Expr> left = new Vector(0);
         Vector<Expr> right = new Vector(0);
@@ -364,6 +379,7 @@ public class SyntaticAnalysis {
     // Feito
     // <post>     ::= ( if | unless ) <boolexpr>
     private Command procPost(Command cmmd) throws LexicalException {
+        System.out.println("Doing procPost");
         int line = lex.getLine();
         boolean isIf = true;
         
@@ -391,6 +407,7 @@ public class SyntaticAnalysis {
     // Feito
     // <boolexpr> ::= [ not ] <cmpexpr> [ (and | or) <boolexpr> ]
     private BoolExpr procBoolExpr() throws LexicalException {
+        System.out.println("Doing procBoolExpr");
         boolean isInverted = false;
         if( current.type == TokenType.NOT){
             isInverted = true;
@@ -421,6 +438,7 @@ public class SyntaticAnalysis {
     // Feito
     // <cmpexpr>  ::= <expr> ( '==' | '!=' | '<' | '<=' | '>' | '>=' | '===' ) <expr>
     private BoolExpr procCmpExpr() throws LexicalException {
+        System.out.println("Doing procCmpExpr");
         Expr left = procExpr();
         RelOp op = null;
         if((current.type == TokenType.EQUALS) || 
@@ -457,6 +475,7 @@ public class SyntaticAnalysis {
     // Feito
     // <expr>     ::= <arith> [ ( '..' | '...' ) <arith> ]
     private Expr procExpr() throws LexicalException {
+        System.out.println("Doing procExpr");
         int line = lex.getLine();
         Expr mainExpr = procArith();
 
@@ -479,6 +498,7 @@ public class SyntaticAnalysis {
     // Feito
     // <arith>    ::= <term> { ('+' | '-') <term> }
     private Expr procArith() throws LexicalException {
+        System.out.println("Doing procArith");
         int line = lex.getLine();
         Expr mainExpr = procTerm();
         
@@ -500,6 +520,7 @@ public class SyntaticAnalysis {
     // Feito
     // <term>     ::= <power> { ('*' | '/' | '%') <power> }
     private Expr procTerm() throws LexicalException {
+        System.out.println("Doing procTerm");
         int line = lex.getLine();
         Expr mainExpr = procPower();
         
@@ -525,6 +546,7 @@ public class SyntaticAnalysis {
     // Feito
     // <power>    ::= <factor> { '**' <factor> }
     private Expr procPower() throws LexicalException {
+        System.out.println("Doing procPower");
         int line = lex.getLine();
         Expr mainExpr = procFactor();
 
@@ -546,6 +568,7 @@ public class SyntaticAnalysis {
     // Feito
     // <factor>   ::= [ '+' | '-' ] ( <const> | <input> | <access> ) [ <function> ]
     private Expr procFactor() throws LexicalException {
+        System.out.println("Doing procFactor");
         int line = lex.getLine();
         
         ConvOp op = null;
@@ -577,6 +600,7 @@ public class SyntaticAnalysis {
     // Feito
     // <const>    ::= <integer> | <string> | <array>
     private Expr procConst() throws LexicalException {
+        System.out.println("Doing procConst");
         Expr expr;
         if (current.type == TokenType.INTEGER) {
             expr = procInteger();
@@ -591,11 +615,14 @@ public class SyntaticAnalysis {
     // Feito
     // <input>    ::= gets | rand
     private Expr procInput() throws LexicalException {
+        System.out.println("Doing procInput");
         int line = lex.getLine();
         if (current.type == TokenType.GETS){
+            advance();
             return (new InputExpr(line, InputOp.GetsOp));
         }
         else if (current.type == TokenType.RAND){
+            advance();
             return (new InputExpr(line, InputOp.RandOp));
         }
         else
@@ -606,6 +633,7 @@ public class SyntaticAnalysis {
     //Feito
     // <array>    ::= '[' [ <expr> { ',' <expr> } ] ']'
     private Expr procArray() throws LexicalException {
+        System.out.println("Doing procArray");
         int line = lex.getLine();
         eat(TokenType.OPEN_BRA);
 
@@ -635,6 +663,7 @@ public class SyntaticAnalysis {
     // Feito
     // <access>   ::= ( <id> | '(' <expr> ')' ) [ '[' <expr> ']' ]
     private Expr procAccess() throws LexicalException {
+        System.out.println("Doing procAccess");
         int line = lex.getLine();
         Expr baseExpr = null;
 
@@ -665,6 +694,7 @@ public class SyntaticAnalysis {
     // Feito
     // <function> ::= '.' ( length | to_i | to_s )
     private FunctionExpr procFunction(Expr expr) throws LexicalException {
+        System.out.println("Doing procFunction");
         int line = lex.getLine();
         eat(TokenType.DOT);
         
@@ -681,14 +711,15 @@ public class SyntaticAnalysis {
             op = FunctionOp.ToStringOp;
             advance();
         }
-        else
+        else{
             showError();
-
-        return new FunctionExpr(line,expr.expr(),op);
+        }
+        return new FunctionExpr(line,expr,op);
     }
 
     // Feito
     private ConstExpr procInteger() throws LexicalException {
+        System.out.println("Doing procInteger");
         String str = current.token;
         eat(TokenType.INTEGER);
         int line = lex.getLine();
@@ -707,6 +738,7 @@ public class SyntaticAnalysis {
 
     // Feito
     private ConstExpr procString() throws LexicalException {
+        System.out.println("Doing procString");
         String str = current.token;
         eat(TokenType.STRING);
         int line = lex.getLine();
@@ -718,6 +750,7 @@ public class SyntaticAnalysis {
 
     // Feito
     private Variable procId() throws LexicalException {
+        System.out.println("Doing procId");
         int line = lex.getLine();
         String identifier = current.token;
         
